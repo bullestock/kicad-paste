@@ -13,10 +13,42 @@ File.readlines(infile).each do |line|
       pos = line.index 'd='
       parts = line[pos+2..].split(' ')
       if parts.size == 9
-        puts '<rect'
+        puts '  <rect'
         puts style
         xy = parts[1].split(',')
-        puts "     x=\"#{xy[0]}\" y=\"#{xy[1]}\" width=\"#{parts[3].to_i.abs()}\" height=\"#{parts[5]}\""
+        w = nil
+        h = nil
+        i = 2
+        found_v = false
+        found_h = false
+        while i < parts.size
+          p = parts[i]
+          if p == 'v'
+            found_v = true
+          elsif p == 'h'
+            found_h = true
+          elsif found_v
+            h = p.to_i
+            found_v = false
+          elsif found_h
+            w = p.to_i
+            found_h = false
+          end
+          if w && h
+            break
+          end
+          i = i + 1
+        end
+        x = xy[0].to_i
+        y = xy[1].to_i
+        if w < 0
+          x = x + w
+        end
+        if h < 0
+          y = y + h
+        end
+        rr=500000
+        puts "     x=\"#{x}\" y=\"#{y}\" width=\"#{w.abs()}\" height=\"#{h.abs()}\" rx=\"#{rr}\" ry=\"#{rr}\""
       else
         # complex path
         puts '<path'
